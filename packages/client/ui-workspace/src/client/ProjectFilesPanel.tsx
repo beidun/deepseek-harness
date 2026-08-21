@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Button, IconFolderOpenOutline16, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconCloseFill14 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { WorkspaceId, WorkspaceView } from '@deepseek-ai/dsh-client-runtime/client'
 import type { WorkspaceBrowserProps } from './contract/slots.ts'
 import type { ProjectFileContent } from '@deepseek-ai/dsh-api-remotes/client'
@@ -17,12 +17,14 @@ type EditorState =
   | { status: 'error'; message: string }
   | { status: 'ready'; path: string; content: string; version: ProjectFileContent['version']; saving: boolean }
 
-/** Modal project browser over the selected registered Workspace. */
+/** Docked project browser that replaces the sidebar's workspace/session view. */
 export function ProjectFilesPanel({
-  wide, useWorkspaces, listProjectFiles, readProjectFile, saveProjectFile,
-}: Pick<WorkspaceBrowserProps, 'wide' | 'useWorkspaces' | 'listProjectFiles' | 'readProjectFile' | 'saveProjectFile'>): ReactNode {
+  open, onClose, useWorkspaces, listProjectFiles, readProjectFile, saveProjectFile,
+}: Pick<WorkspaceBrowserProps, 'useWorkspaces' | 'listProjectFiles' | 'readProjectFile' | 'saveProjectFile'> & {
+  open: boolean
+  onClose: () => void
+}): ReactNode {
   const workspaces = useWorkspaces(state => state.items)
-  const [open, setOpen] = useState(false)
   const [workspaceId, setWorkspaceId] = useState<WorkspaceId | undefined>()
   const [files, setFiles] = useState<FileState>({ status: 'idle' })
   const [editor, setEditor] = useState<EditorState>({ status: 'idle' })
@@ -66,15 +68,16 @@ export function ProjectFilesPanel({
     )
   }
 
-  return <>
-    <Tooltip label="项目文件" disabled={wide}>
-      <button type="button" className={css.iconButton} aria-label="项目文件" onClick={() => setOpen(true)}>
-        <IconFolderOpenOutline16 size={wide ? 16 : 18} />
+  if (!open) return null
+
+  return <section className={css.projectFilesDock} aria-label="项目文件">
+    <header className={css.projectFilesHeader}>
+      <strong>项目文件</strong>
+      <button type="button" className={css.iconButton} aria-label="关闭项目文件" onClick={onClose}>
+        <IconCloseFill14 />
       </button>
-    </Tooltip>
-    <Modal open={open} onClose={() => setOpen(false)} closeLabel="关闭" title="项目文件" footer={editor.status === 'ready' ? (
-      <Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button>
-    ) : undefined}>
+    </header>
+    <div className={css.projectFilesContent}>
       {workspaces.length === 0 ? <p>请先添加一个工作区。</p> : <div className={css.projectFiles}>
         <label>工作区<select value={workspaceId ?? ''} onChange={event => selectWorkspace(event.currentTarget.value as WorkspaceId)}>
           {workspaces.map((workspace: WorkspaceView) => <option key={workspace.workspaceId} value={workspace.workspaceId}>{workspace.title}</option>)}
@@ -91,10 +94,10 @@ export function ProjectFilesPanel({
             {editor.status === 'idle' ? <p>选择一个文件以查看和编辑。</p> : null}
             {editor.status === 'loading' ? <p>正在读取文件…</p> : null}
             {editor.status === 'error' ? <p role="alert">{editor.message}</p> : null}
-            {editor.status === 'ready' ? <><div>{editor.path}</div><textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} /></> : null}
+            {editor.status === 'ready' ? <><div className={css.projectEditorTitle}>{editor.path}</div><textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} /><Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button></> : null}
           </div>
         </div> : null}
       </div>}
-    </Modal>
-  </>
+    </div>
+  </section>
 }
