@@ -105,7 +105,7 @@ export function apply(ctx: ClientContext): void {
     },
     createWorkspace: input => ctx.workspaces.create(input),
     listProjectFiles: async (workspaceId, path): Promise<ProjectFileListing> => {
-      const result = await ctx.remote.projectFiles.list(workspaceId, path)
+      const result = await ctx.remote.projectFiles.list(workspaceId, path ?? '.')
       if (!result.ok) throw new Error(result.error.message)
       return result.value
     },
