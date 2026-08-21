@@ -24,6 +24,7 @@ import { deriveFlat, deriveGroups, deriveSearchResults, UNGROUPED_KEY } from './
 import { ProjectRowItem, SearchResultItem, SessionNodeItem } from './rows/Rows.tsx'
 import { FLAT_SESSION_ORDER_KEY } from './stores.ts'
 import { WorkspacePickFlow } from './WorkspacePicker.tsx'
+import { ProjectFilesPanel } from './ProjectFilesPanel.tsx'
 import css from './WorkspaceBrowser.module.css'
 
 /**
@@ -758,6 +759,9 @@ export function WorkspaceBrowser({
   archiveSession,
   insertSessionBefore,
   createWorkspace,
+  listProjectFiles,
+  readProjectFile,
+  saveProjectFile,
   searchSessions,
   searchResultLimit,
   useDirectoryFlow,
@@ -1057,6 +1061,13 @@ export function WorkspaceBrowser({
               t={t}
             />
           )}
+          <ProjectFilesPanel
+            wide={wide}
+            useWorkspaces={useWorkspaces}
+            listProjectFiles={listProjectFiles}
+            readProjectFile={readProjectFile}
+            saveProjectFile={saveProjectFile}
+          />
           {/* Adding is the button's one action, so a composition with no
               picking affordance has nothing to offer here: the region hides the
               button rather than leaving a dead one in the header. */}

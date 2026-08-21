@@ -32,6 +32,7 @@ import type {
   SessionId, SessionSearchResultItem, WorkspaceId, WorkspaceView,
 } from '@deepseek-ai/dsh-client-runtime/client'
 import type { createWorkspaceViewStore } from '../stores.ts'
+import type { ProjectFileContent, ProjectFileListing } from '@deepseek-ai/dsh-api-remotes/client'
 
 /**
  * Owner share of the directory-flow holes: the complete conversation between
@@ -137,6 +138,12 @@ export type WorkspaceBrowserInjected = {
   insertSessionBefore: (workspaceId: WorkspaceId, sessionId: SessionId, beforeSessionId?: SessionId) => Promise<void>
   /** Adopt a picked host directory as a real Workspace before targeting a Session. */
   createWorkspace: (input: { path: string }) => Promise<WorkspaceView>
+  /** List one directory in a registered Workspace. */
+  listProjectFiles: (workspaceId: WorkspaceId, path?: string) => Promise<ProjectFileListing>
+  /** Read one editable project file. */
+  readProjectFile: (workspaceId: WorkspaceId, path: string) => Promise<ProjectFileContent>
+  /** Save an unchanged-version project file. */
+  saveProjectFile: (workspaceId: WorkspaceId, path: string, content: string, version: ProjectFileContent['version']) => Promise<ProjectFileContent>
 }
 
 /** Full browser props: shell owner share + viewing store + injected actions + the locale seat. */
