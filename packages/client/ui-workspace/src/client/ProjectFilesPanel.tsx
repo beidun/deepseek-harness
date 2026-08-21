@@ -17,12 +17,11 @@ type EditorState =
   | { status: 'error'; message: string }
   | { status: 'ready'; path: string; content: string; version: ProjectFileContent['version']; saving: boolean }
 
-/** Docked project browser that replaces the sidebar's workspace/session view. */
+/** Project browser docked into the layout-owned right column. */
 export function ProjectFilesPanel({
-  open, onClose, useWorkspaces, listProjectFiles, readProjectFile, saveProjectFile,
+  closeProjectFiles, useWorkspaces, listProjectFiles, readProjectFile, saveProjectFile,
 }: Pick<WorkspaceBrowserProps, 'useWorkspaces' | 'listProjectFiles' | 'readProjectFile' | 'saveProjectFile'> & {
-  open: boolean
-  onClose: () => void
+  closeProjectFiles: () => void
 }): ReactNode {
   const workspaces = useWorkspaces(state => state.items)
   const [workspaceId, setWorkspaceId] = useState<WorkspaceId | undefined>()
@@ -38,14 +37,13 @@ export function ProjectFilesPanel({
     )
   }
   useEffect(() => {
-    if (!open) return
     const first = workspaceId ?? workspaces[0]?.workspaceId
     if (first === undefined) return
     if (workspaceId === undefined) setWorkspaceId(first)
     loadDirectory(first)
   // Opening or changing registered workspace intentionally resets to its root.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, workspaceId])
+  }, [workspaceId])
 
   const selectWorkspace = (id: WorkspaceId): void => {
     setWorkspaceId(id)
@@ -68,12 +66,10 @@ export function ProjectFilesPanel({
     )
   }
 
-  if (!open) return null
-
   return <section className={css.projectFilesDock} aria-label="项目文件">
     <header className={css.projectFilesHeader}>
       <strong>项目文件</strong>
-      <button type="button" className={css.iconButton} aria-label="关闭项目文件" onClick={onClose}>
+      <button type="button" className={css.iconButton} aria-label="关闭项目文件" onClick={closeProjectFiles}>
         <IconCloseFill14 />
       </button>
     </header>
@@ -85,16 +81,16 @@ export function ProjectFilesPanel({
         {files.status === 'loading' ? <p>正在读取文件…</p> : null}
         {files.status === 'error' ? <p role="alert">{files.message}</p> : null}
         {files.status === 'ready' ? <div className={css.projectFilesBody}>
-          <div className={css.projectTree}>
-            {files.path !== '.' ? <button type="button" onClick={() => loadDirectory(workspaceId!, files.path.split('/').slice(0, -1).join('/') || '.')}>..</button> : null}
-            {files.entries.map(entry => <button key={entry.path} type="button" onClick={() => entry.type === 'directory' ? loadDirectory(workspaceId!, entry.path) : openFile(entry.path)}>{entry.type === 'directory' ? '📁 ' : '📄 '}{entry.name}</button>)}
-            {files.truncated ? <p>目录内容过多，仅显示前一部分。</p> : null}
-          </div>
           <div className={css.projectEditor}>
             {editor.status === 'idle' ? <p>选择一个文件以查看和编辑。</p> : null}
             {editor.status === 'loading' ? <p>正在读取文件…</p> : null}
             {editor.status === 'error' ? <p role="alert">{editor.message}</p> : null}
             {editor.status === 'ready' ? <><div className={css.projectEditorTitle}>{editor.path}</div><textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} /><Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button></> : null}
+          </div>
+          <div className={css.projectTree}>
+            {files.path !== '.' ? <button type="button" onClick={() => loadDirectory(workspaceId!, files.path.split('/').slice(0, -1).join('/') || '.')}>..</button> : null}
+            {files.entries.map(entry => <button key={entry.path} type="button" onClick={() => entry.type === 'directory' ? loadDirectory(workspaceId!, entry.path) : openFile(entry.path)}>{entry.type === 'directory' ? '📁 ' : '📄 '}{entry.name}</button>)}
+            {files.truncated ? <p>目录内容过多，仅显示前一部分。</p> : null}
           </div>
         </div> : null}
       </div>}
