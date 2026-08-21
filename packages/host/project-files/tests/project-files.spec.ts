@@ -47,7 +47,7 @@ describe('ProjectFilesService', () => {
     ])
     const service = await harness(root)
 
-    await expect(service.list('workspace-1')).resolves.toEqual({
+    await expect(service.list('workspace-1', '.')).resolves.toEqual({
       path: '.',
       entries: [
         { name: 'a.ts', path: 'a.ts', size: 1, type: 'file' },
