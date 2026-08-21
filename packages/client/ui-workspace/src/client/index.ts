@@ -13,12 +13,14 @@ import type { ProjectFileContent, ProjectFileListing } from '@deepseek-ai/dsh-ap
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { WorkspaceBrowserInjected, WorkspacePickerInjected } from './contract/slots.ts'
 import { createWorkspaceViewStore } from './stores.ts'
 import { WorkspaceBrowser } from './WorkspaceBrowser.tsx'
 import { WorkspacePicker } from './WorkspacePicker.tsx'
+import { ProjectFilesPanel } from './ProjectFilesPanel.tsx'
 import { en, zh, type WorkspaceKey } from './locales.ts'
 
 export type {
@@ -45,7 +47,7 @@ const NS = 'workspace'
  * provides a waitable service. apply therefore depends on each slot
  * declaration through `slots.inject()` instead of assuming order.
  */
-export const inject = ['slots', 'sessions', 'workspaces', 'locale', 'connection', 'remote', 'remote.projectFiles']
+export const inject = ['slots', 'sessions', 'workspaces', 'locale', 'layout', 'connection', 'remote', 'remote.projectFiles']
 
 /**
  * Register the browser and picker once their slot declarations are on the
@@ -119,6 +121,8 @@ export function apply(ctx: ClientContext): void {
       if (!result.ok) throw new Error(result.error.message)
       return result.value
     },
+    openProjectFiles: () => { ctx.layout.openProjectFiles() },
+    closeProjectFiles: () => { ctx.layout.closeProjectFiles() },
     hooks: { directoryFlow: browserFlowSource, hostDescription },
   })
   const pickerInjected = (): WorkspacePickerInjected => ({
@@ -145,5 +149,18 @@ export function apply(ctx: ClientContext): void {
       locale: NS,
     },
     WorkspacePicker,
+  ))
+  ctx.slots.inject('project-files', () => ctx.slots.register(
+    {
+      name: 'project-files',
+      locale: NS,
+      inject: () => ({
+        listProjectFiles: browserInjected().listProjectFiles,
+        readProjectFile: browserInjected().readProjectFile,
+        saveProjectFile: browserInjected().saveProjectFile,
+        closeProjectFiles: () => { ctx.layout.closeProjectFiles() },
+      }),
+    },
+    ProjectFilesPanel,
   ))
 }
