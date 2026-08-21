@@ -20,7 +20,13 @@ import {
  * `narrowExpanded` is the manual override that re-expands the auto-collapsed
  * sidebar over the squeezed center without rewriting the width preference.
  */
-type LayoutState = { sidebar: number; details: number; narrow: boolean; narrowExpanded: boolean }
+type LayoutState = {
+  sidebar: number
+  details: number
+  rightPanel: 'none' | 'details' | 'project-files'
+  narrow: boolean
+  narrowExpanded: boolean
+}
 
 /**
  * Annotation twin of the actions literal below (the export needs a declared
@@ -33,6 +39,8 @@ type LayoutActions = {
   setNarrow: (draft: LayoutState, narrow: boolean) => void
   openDetails: (draft: LayoutState) => void
   closeDetails: (draft: LayoutState) => void
+  openProjectFiles: (draft: LayoutState) => void
+  closeProjectFiles: (draft: LayoutState) => void
 }
 
 /**
@@ -47,7 +55,7 @@ type LayoutActions = {
  */
 export function createLayoutStore(): EngineStoreHandle<LayoutState, LayoutActions>  {
   const handle = defineStore({
-    init: (): LayoutState => ({ sidebar: SIDEBAR_DEFAULT, details: 0, narrow: false, narrowExpanded: false }),
+    init: (): LayoutState => ({ sidebar: SIDEBAR_DEFAULT, details: 0, rightPanel: 'none', narrow: false, narrowExpanded: false }),
     actions: {
       setSidebar: (d, px: number) => { d.sidebar = clampWidth(px, SIDEBAR_MIN, SIDEBAR_MAX) },
       setDetails: (d, px: number) => { d.details = clampWidth(px, DETAILS_MIN, DETAILS_MAX) },
@@ -64,8 +72,10 @@ export function createLayoutStore(): EngineStoreHandle<LayoutState, LayoutAction
         d.narrow = narrow
         d.narrowExpanded = false
       },
-      openDetails: (d) => { if (d.details === 0) d.details = DETAILS_DEFAULT },
-      closeDetails: (d) => { d.details = 0 },
+      openDetails: (d) => { d.rightPanel = 'details'; if (d.details === 0) d.details = DETAILS_DEFAULT },
+      closeDetails: (d) => { if (d.rightPanel === 'details') { d.rightPanel = 'none'; d.details = 0 } },
+      openProjectFiles: (d) => { d.rightPanel = 'project-files'; if (d.details === 0) d.details = DETAILS_DEFAULT },
+      closeProjectFiles: (d) => { if (d.rightPanel === 'project-files') { d.rightPanel = 'none'; d.details = 0 } },
     },
   })
   return handle
