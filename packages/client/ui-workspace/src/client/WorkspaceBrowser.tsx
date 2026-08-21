@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import {
   Button, IconCloseFill14, IconPersonalizationOutline16,
-  IconProjectAddOutline16, IconSearchOutline16, Menu, Modal, Tooltip,
+  IconFolderOpenOutline16, IconProjectAddOutline16, IconSearchOutline16, Menu, Modal, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
   SessionId, SessionListState, SessionSearchResultItem, WorkspaceId, WorkspaceView,
@@ -805,6 +805,7 @@ export function WorkspaceBrowser({
   // Section-header ＋ opens the picker menu (same popover in wide and rail
   // states; the menu anchors on this button).
   const [wsPickerOpen, setWsPickerOpen] = useState(false)
+  const [projectFilesOpen, setProjectFilesOpen] = useState(false)
   const wsPlusRef = useRef<HTMLButtonElement>(null)
   const composingRef = useRef(false)
 
@@ -1061,13 +1062,19 @@ export function WorkspaceBrowser({
               t={t}
             />
           )}
-          <ProjectFilesPanel
-            wide={wide}
-            useWorkspaces={useWorkspaces}
-            listProjectFiles={listProjectFiles}
-            readProjectFile={readProjectFile}
-            saveProjectFile={saveProjectFile}
-          />
+          <Tooltip label="项目文件" disabled={wide}>
+            <button
+              type="button"
+              className={css.iconButton}
+              aria-label="项目文件"
+              onClick={() => {
+                setProjectFilesOpen(true)
+                if (!wide) expandSidebar()
+              }}
+            >
+              <IconFolderOpenOutline16 size={wide ? 16 : 18} />
+            </button>
+          </Tooltip>
           {/* Adding is the button's one action, so a composition with no
               picking affordance has nothing to offer here: the region hides the
               button rather than leaving a dead one in the header. */}
@@ -1105,6 +1112,15 @@ export function WorkspaceBrowser({
           onClose={() => { setWsPickerOpen(false) }}
         />
       </div>
+
+      <ProjectFilesPanel
+        open={projectFilesOpen}
+        onClose={() => setProjectFilesOpen(false)}
+        useWorkspaces={useWorkspaces}
+        listProjectFiles={listProjectFiles}
+        readProjectFile={readProjectFile}
+        saveProjectFile={saveProjectFile}
+      />
 
       {/* The collapsed rail keeps search as its own 36px control. */}
       {!wide && <div className={css.search}>
