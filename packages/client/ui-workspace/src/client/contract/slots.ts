@@ -144,6 +144,10 @@ export type WorkspaceBrowserInjected = {
   readProjectFile: (workspaceId: WorkspaceId, path: string) => Promise<ProjectFileContent>
   /** Save an unchanged-version project file. */
   saveProjectFile: (workspaceId: WorkspaceId, path: string, content: string, version: ProjectFileContent['version']) => Promise<ProjectFileContent>
+  /** Open the project files panel in the layout-owned right column. */
+  openProjectFiles: () => void
+  /** Close the project files panel. */
+  closeProjectFiles: () => void
 }
 
 /** Full browser props: shell owner share + viewing store + injected actions + the locale seat. */
