@@ -24,7 +24,6 @@ import { deriveFlat, deriveGroups, deriveSearchResults, UNGROUPED_KEY } from './
 import { ProjectRowItem, SearchResultItem, SessionNodeItem } from './rows/Rows.tsx'
 import { FLAT_SESSION_ORDER_KEY } from './stores.ts'
 import { WorkspacePickFlow } from './WorkspacePicker.tsx'
-import { ProjectFilesPanel } from './ProjectFilesPanel.tsx'
 import css from './WorkspaceBrowser.module.css'
 
 /**
@@ -759,9 +758,7 @@ export function WorkspaceBrowser({
   archiveSession,
   insertSessionBefore,
   createWorkspace,
-  listProjectFiles,
-  readProjectFile,
-  saveProjectFile,
+  openProjectFiles,
   searchSessions,
   searchResultLimit,
   useDirectoryFlow,
@@ -805,7 +802,6 @@ export function WorkspaceBrowser({
   // Section-header ＋ opens the picker menu (same popover in wide and rail
   // states; the menu anchors on this button).
   const [wsPickerOpen, setWsPickerOpen] = useState(false)
-  const [projectFilesOpen, setProjectFilesOpen] = useState(false)
   const wsPlusRef = useRef<HTMLButtonElement>(null)
   const composingRef = useRef(false)
 
@@ -1068,7 +1064,7 @@ export function WorkspaceBrowser({
               className={css.iconButton}
               aria-label="项目文件"
               onClick={() => {
-                setProjectFilesOpen(true)
+                openProjectFiles()
                 if (!wide) expandSidebar()
               }}
             >
@@ -1112,15 +1108,6 @@ export function WorkspaceBrowser({
           onClose={() => { setWsPickerOpen(false) }}
         />
       </div>
-
-      <ProjectFilesPanel
-        open={projectFilesOpen}
-        onClose={() => setProjectFilesOpen(false)}
-        useWorkspaces={useWorkspaces}
-        listProjectFiles={listProjectFiles}
-        readProjectFile={readProjectFile}
-        saveProjectFile={saveProjectFile}
-      />
 
       {/* The collapsed rail keeps search as its own 36px control. */}
       {!wide && <div className={css.search}>
