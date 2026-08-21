@@ -1,5 +1,3 @@
-import type { FsVersion } from '@deepseek-ai/dsh-fs'
-
 /** One direct child shown in the project file tree. */
 export interface ProjectFileEntry {
   /** One path segment relative to the listed directory. */
@@ -26,5 +24,5 @@ export interface ProjectFileListing {
 export interface ProjectFileContent {
   readonly path: string
   readonly content: string
-  readonly version: FsVersion
+  readonly version: string
 }
