@@ -4,7 +4,7 @@ import { isAbsolute } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import { TypertRemoteService, Remote } from '@deepseek-ai/dsh-typert-protocol'
-import type { FsTarget, FsVersion } from '@deepseek-ai/dsh-fs'
+import { FsVersion, type FsTarget } from '@deepseek-ai/dsh-fs'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import type { Workspace } from '@deepseek-ai/dsh-workspace'
 import type { ProjectFileContent, ProjectFileEntry, ProjectFileListing } from './types.ts'
@@ -55,7 +55,7 @@ export class ProjectFilesService extends TypertRemoteService {
 
   /** List one safe directory level below a registered Workspace. */
   @Remote('list')
-  async list(workspaceId: string, path = '.'): Promise<ProjectFileListing> {
+  async list(workspaceId: string, path: string): Promise<ProjectFileListing> {
     const target = await resolveInside(this.ctx, this.workspace(workspaceId), path)
     const entries: ProjectFileEntry[] = []
     let truncated = false
@@ -84,9 +84,9 @@ export class ProjectFilesService extends TypertRemoteService {
 
   /** Save text only when the browser still holds the latest observed version. */
   @Remote('save')
-  async save(workspaceId: string, path: string, content: string, expectedVersion: FsVersion): Promise<ProjectFileContent> {
+  async save(workspaceId: string, path: string, content: string, expectedVersion: string): Promise<ProjectFileContent> {
     const target = await resolveInside(this.ctx, this.workspace(workspaceId), path)
-    const outcome = await this.ctx.fs.writeText(target, content, { kind: 'replaceIfVersion', version: expectedVersion })
+    const outcome = await this.ctx.fs.writeText(target, content, { kind: 'replaceIfVersion', version: FsVersion(expectedVersion) })
     return { path, content: outcome.after, version: outcome.version }
   }
 }
