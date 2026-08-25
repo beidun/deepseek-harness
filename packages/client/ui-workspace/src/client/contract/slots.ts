@@ -144,6 +144,8 @@ export type WorkspaceBrowserInjected = {
   readProjectFile: (workspaceId: WorkspaceId, path: string) => Promise<ProjectFileContent>
   /** Save an unchanged-version project file. */
   saveProjectFile: (workspaceId: WorkspaceId, path: string, content: string, version: ProjectFileContent['version']) => Promise<ProjectFileContent>
+  /** Create a new project file without replacing an existing file. */
+  createProjectFile: (workspaceId: WorkspaceId, path: string, content: string) => Promise<ProjectFileContent>
   /** Open the project files panel in the layout-owned right column. */
   openProjectFiles: () => void
   /** Close the project files panel. */
