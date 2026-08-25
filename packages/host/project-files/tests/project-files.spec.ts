@@ -88,13 +88,12 @@ describe('ProjectFilesService', () => {
 
   it('creates a new text file without replacing an existing file', async () => {
     const root = await mkdtemp(join(tmpdir(), 'dsh-project-files-'))
-    await mkdir(join(root, 'src'))
     const service = await harness(root)
 
-    const created = await service.create('workspace-1', 'src/new.ts', 'export {}\n')
-    expect(created).toMatchObject({ path: 'src/new.ts', content: 'export {}\n' })
-    await expect(service.read('workspace-1', 'src/new.ts')).resolves.toMatchObject({ content: 'export {}\n' })
-    await expect(service.create('workspace-1', 'src/new.ts', 'replaced')).rejects.toThrow()
+    const created = await service.create('workspace-1', 'src/generated/new.ts', 'export {}\n')
+    expect(created).toMatchObject({ path: 'src/generated/new.ts', content: 'export {}\n' })
+    await expect(service.read('workspace-1', 'src/generated/new.ts')).resolves.toMatchObject({ content: 'export {}\n' })
+    await expect(service.create('workspace-1', 'src/generated/new.ts', 'replaced')).rejects.toThrow()
     await expect(service.create('workspace-1', '.', '')).rejects.toThrow('new file path')
   })
 })
