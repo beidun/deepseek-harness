@@ -25,7 +25,7 @@ async function harness(root: string, config: { maxEntries?: number; maxFileBytes
 }
 
 describe('ProjectFilesService', () => {
-  it('publishes direct list, read, and save methods', async () => {
+  it('publishes direct list, read, save, and create methods', async () => {
     const root = await mkdtemp(join(tmpdir(), 'dsh-project-files-'))
     const service = await harness(root)
 
@@ -33,6 +33,7 @@ describe('ProjectFilesService', () => {
       { method: 'list', invocation: { kind: 'direct' } },
       { method: 'read', invocation: { kind: 'direct' } },
       { method: 'save', invocation: { kind: 'direct' } },
+      { method: 'create', invocation: { kind: 'direct' } },
     ])
   })
 
@@ -83,5 +84,17 @@ describe('ProjectFilesService', () => {
     const saved = await service.save('workspace-1', 'small.ts', 'const a = 2\r\n', initial.version)
     expect(saved.content).toBe('const a = 2\n')
     await expect(service.save('workspace-1', 'small.ts', 'const a = 3\n', initial.version)).rejects.toThrow()
+  })
+
+  it('creates a new text file without replacing an existing file', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'dsh-project-files-'))
+    await mkdir(join(root, 'src'))
+    const service = await harness(root)
+
+    const created = await service.create('workspace-1', 'src/new.ts', 'export {}\n')
+    expect(created).toMatchObject({ path: 'src/new.ts', content: 'export {}\n' })
+    await expect(service.read('workspace-1', 'src/new.ts')).resolves.toMatchObject({ content: 'export {}\n' })
+    await expect(service.create('workspace-1', 'src/new.ts', 'replaced')).rejects.toThrow()
+    await expect(service.create('workspace-1', '.', '')).rejects.toThrow('new file path')
   })
 })
