@@ -18,6 +18,8 @@ type EditorState =
   | { status: 'error'; message: string }
   | { status: 'ready'; path: string; content: string; version: ProjectFileContent['version']; saving: boolean; dirty: boolean; saveError?: string | undefined }
 
+type CreateMode = 'new' | 'copy'
+
 /** Project browser docked into the layout-owned right column. */
 export function ProjectFilesPanel({
   closeProjectFiles, useWorkspaces, listProjectFiles, readProjectFile, saveProjectFile, createProjectFile,
@@ -29,6 +31,7 @@ export function ProjectFilesPanel({
   const [files, setFiles] = useState<FileState>({ status: 'idle' })
   const [editor, setEditor] = useState<EditorState>({ status: 'idle' })
   const [creating, setCreating] = useState(false)
+  const [createMode, setCreateMode] = useState<CreateMode>('new')
   const [newFileName, setNewFileName] = useState('')
   const [createError, setCreateError] = useState<string | undefined>()
 
@@ -79,15 +82,18 @@ export function ProjectFilesPanel({
   const createFile = (): void => {
     if (workspaceId === undefined || files.status !== 'ready') return
     const name = newFileName.trim()
-    if (name.length === 0 || name === '.' || name === '..' || /[\\/]/.test(name)) {
-      setCreateError('请输入当前目录内的有效文件名。')
+    const segments = name.split(/[\\/]/)
+    if (name.length === 0 || name.startsWith('/') || segments.some(segment => segment.length === 0 || segment === '.' || segment === '..')) {
+      setCreateError('请输入有效的相对路径，例如 src/config.ts。')
       return
     }
     const path = files.path === '.' ? name : `${files.path}/${name}`
     setCreateError(undefined)
-    void createProjectFile(workspaceId, path, '').then(
+    const content = createMode === 'copy' && editor.status === 'ready' ? editor.content : ''
+    void createProjectFile(workspaceId, path, content).then(
       result => {
         setCreating(false)
+        setCreateMode('new')
         setNewFileName('')
         setEditor({ status: 'ready', ...result, saving: false, dirty: false })
         void listProjectFiles(workspaceId, files.path).then(
@@ -99,6 +105,16 @@ export function ProjectFilesPanel({
     )
   }
   const close = (): void => { if (discardChanges()) closeProjectFiles() }
+  const beginCreate = (mode: CreateMode): void => {
+    setCreateMode(mode)
+    setNewFileName(mode === 'copy' && editor.status === 'ready' ? `${editor.path}.copy` : '')
+    setCreateError(undefined)
+    setCreating(true)
+  }
+  const reloadFile = (): void => {
+    if (editor.status !== 'ready' || !discardChanges()) return
+    openFile(editor.path)
+  }
 
   return <section className={css.projectFilesDock} aria-label="项目文件">
     <header className={css.projectFilesHeader}>
@@ -122,6 +138,8 @@ export function ProjectFilesPanel({
             {editor.status === 'ready' ? <>
               <div className={css.projectEditorToolbar}>
                 <div className={css.projectEditorTitle} title={editor.path}>{editor.path}{editor.dirty ? <span className={css.projectEditorDirty}>未保存</span> : null}</div>
+                <button type="button" className={css.projectEditorAction} onClick={reloadFile} disabled={editor.saving}>恢复</button>
+                <button type="button" className={css.projectEditorAction} onClick={() => beginCreate('copy')} disabled={editor.saving}>另存为</button>
                 <Button variant="primary" disabled={!editor.dirty || editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button>
               </div>
               <ProjectCodeEditor
@@ -135,8 +153,8 @@ export function ProjectFilesPanel({
             </> : null}
           </div>
           <div className={css.projectTree}>
-            <div className={css.projectTreeHeader}><span>文件{files.path === '.' ? '' : ` · ${files.path}`}</span><button className={css.projectNewFileButton} type="button" onClick={() => { setCreating(true); setCreateError(undefined) }} aria-label="新建文件">＋</button></div>
-            {creating ? <form className={css.projectNewFileForm} onSubmit={(event) => { event.preventDefault(); createFile() }}><input className={css.projectNewFileInput} autoFocus value={newFileName} onChange={event => setNewFileName(event.currentTarget.value)} placeholder="新文件名，例如 config.ts" /><div className={css.projectNewFileActions}><button type="submit">创建</button><button type="button" onClick={() => { setCreating(false); setCreateError(undefined) }}>取消</button></div>{createError === undefined ? null : <p className={css.projectTreeError} role="alert">{createError}</p>}</form> : null}
+            <div className={css.projectTreeHeader}><span>文件{files.path === '.' ? '' : ` · ${files.path}`}</span><button className={css.projectNewFileButton} type="button" onClick={() => beginCreate('new')} aria-label="新建文件">＋</button></div>
+            {creating ? <form className={css.projectNewFileForm} onSubmit={(event) => { event.preventDefault(); createFile() }}><input className={css.projectNewFileInput} autoFocus value={newFileName} onChange={event => setNewFileName(event.currentTarget.value)} placeholder="相对路径，例如 src/config.ts" /><div className={css.projectNewFileActions}><button type="submit">{createMode === 'copy' ? '另存为' : '创建'}</button><button type="button" onClick={() => { setCreating(false); setCreateMode('new'); setCreateError(undefined) }}>取消</button></div>{createError === undefined ? null : <p className={css.projectTreeError} role="alert">{createError}</p>}</form> : null}
             {files.path !== '.' ? <button className={css.projectTreeRow} type="button" onClick={() => openDirectory(files.path.split('/').slice(0, -1).join('/') || '.')}><span className={css.projectFileIcon}>↩</span>上一级</button> : null}
             {files.entries.map(entry => <button key={entry.path} className={`${css.projectTreeRow} ${entry.type === 'file' && editor.status === 'ready' && editor.path === entry.path ? css.projectTreeRowActive : ''}`} type="button" onClick={() => entry.type === 'directory' ? openDirectory(entry.path) : openFile(entry.path)}><span className={css.projectFileIcon}>{entry.type === 'directory' ? '⌄' : '•'}</span><span>{entry.name}</span></button>)}
             {files.truncated ? <p>目录内容过多，仅显示前一部分。</p> : null}
