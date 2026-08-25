@@ -106,6 +106,7 @@ export function apply(ctx: ClientContext): void {
       await ctx.workspaces.insertSessionBefore(workspaceId, sessionId, beforeSessionId)
     },
     createWorkspace: input => ctx.workspaces.create(input),
+    pickWorkspaceDirectory: () => ctx.workspaces.pickDirectory(),
     listProjectFiles: async (workspaceId, path): Promise<ProjectFileListing> => {
       const result = await ctx.remote.projectFiles.list(workspaceId, path ?? '.')
       if (!result.ok) throw new Error(result.error.message)
