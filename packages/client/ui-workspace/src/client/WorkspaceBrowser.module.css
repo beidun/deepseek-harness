@@ -30,7 +30,15 @@
 .projectWorkspaceSelect select { min-width: 0; flex: 1; height: 30px; padding: 0 8px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 7px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font: inherit; }
 .projectFilesBody { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 34%); gap: 0; border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; overflow: hidden; background: var(--dsw-specific-sidebar-fill); }
 .projectTree { display: flex; flex-direction: column; min-width: 0; overflow: auto; border-left: 1px solid var(--dsw-alias-border-l2); }
-.projectTreeHeader { flex: none; height: 34px; display: flex; align-items: center; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-bottom: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); font-size: 12px; font-weight: 500; }
+.projectTreeHeader { flex: none; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 10px; overflow: hidden; border-bottom: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); font-size: 12px; font-weight: 500; }
+.projectTreeHeader > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projectNewFileButton { flex: none; width: 24px; height: 24px; border: 0; border-radius: 5px; background: transparent; color: var(--dsw-alias-label-secondary); cursor: pointer; font-size: 18px; line-height: 1; }
+.projectNewFileButton:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.projectNewFileForm { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
+.projectNewFileInput { min-width: 0; width: 100%; height: 28px; padding: 0 7px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 5px; box-sizing: border-box; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; }
+.projectNewFileActions { display: flex; gap: 6px; }
+.projectNewFileActions button { border: 0; border-radius: 4px; padding: 4px 7px; background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); cursor: pointer; font: inherit; font-size: 12px; }
+.projectTreeError { width: 100%; margin: 0; color: var(--dsw-alias-label-danger); font-size: 11px; line-height: 16px; }
 .projectTreeRow { flex: none; min-width: 0; display: flex; align-items: center; gap: 7px; border: 0; padding: 7px 10px; overflow: hidden; text-align: left; white-space: nowrap; background: transparent; color: var(--dsw-alias-label-primary); cursor: pointer; font: inherit; font-size: 13px; }
 .projectTreeRow > span:last-child { overflow: hidden; text-overflow: ellipsis; }
 .projectFileIcon { width: 12px; flex: none; color: var(--dsw-alias-label-tertiary); font-size: 12px; text-align: center; }
@@ -41,6 +49,8 @@
 .projectEditorToolbar { flex: none; display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 8px 0 10px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
 .projectEditorToolbar button { flex: none; min-height: 24px; padding: 2px 9px; font-size: 12px; }
 .projectEditorTitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code); font-size: 12px; }
+.projectEditorDirty { margin-left: 7px; color: var(--dsw-alias-label-tertiary); font-family: var(--ds-font-family); font-size: 11px; }
+.projectEditorSaveError { flex: none; margin: 0; padding: 7px 10px; border-top: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-danger); font-size: 12px; line-height: 16px; }
 .projectCodeEditor { flex: 1; min-height: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr); overflow: hidden; background: var(--dsw-alias-bg-base); font-family: var(--ds-font-family-code); font-size: 13px; line-height: 20px; }
 .projectCodeGutter { min-width: 0; overflow: hidden; padding: 12px 8px 12px 0; box-sizing: border-box; border-right: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-tertiary); text-align: right; user-select: none; }
 .projectCodeGutter > div { will-change: transform; }
