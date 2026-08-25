@@ -121,6 +121,11 @@ export function apply(ctx: ClientContext): void {
       if (!result.ok) throw new Error(result.error.message)
       return result.value
     },
+    createProjectFile: async (workspaceId, path, content): Promise<ProjectFileContent> => {
+      const result = await ctx.remote.projectFiles.create(workspaceId, path, content)
+      if (!result.ok) throw new Error(result.error.message)
+      return result.value
+    },
     openProjectFiles: () => { ctx.layout.openProjectFiles() },
     closeProjectFiles: () => { ctx.layout.closeProjectFiles() },
     hooks: { directoryFlow: browserFlowSource, hostDescription },
@@ -158,6 +163,7 @@ export function apply(ctx: ClientContext): void {
         listProjectFiles: browserInjected().listProjectFiles,
         readProjectFile: browserInjected().readProjectFile,
         saveProjectFile: browserInjected().saveProjectFile,
+        createProjectFile: browserInjected().createProjectFile,
         closeProjectFiles: () => { ctx.layout.closeProjectFiles() },
       }),
     },
