@@ -155,7 +155,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  max-width: 60px;
+  /* View options + project files + add workspace: three 28px controls and two gaps. */
+  max-width: 92px;
   opacity: 1;
   overflow: hidden;
   visibility: visible;
