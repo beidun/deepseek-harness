@@ -74,8 +74,8 @@ export function ProjectFilesPanel({
       </button>
     </header>
     <div className={css.projectFilesContent}>
-      {workspaces.length === 0 ? <p>请先添加一个工作区。</p> : <div className={css.projectFiles}>
-        <label>工作区<select value={workspaceId ?? ''} onChange={event => selectWorkspace(event.currentTarget.value as WorkspaceId)}>
+      {workspaces.length === 0 ? <p className={css.projectFilesEmpty}>请先添加一个工作区。</p> : <div className={css.projectFiles}>
+        <label className={css.projectWorkspaceSelect}><span>工作区</span><select value={workspaceId ?? ''} onChange={event => selectWorkspace(event.currentTarget.value as WorkspaceId)}>
           {workspaces.map((workspace: WorkspaceView) => <option key={workspace.workspaceId} value={workspace.workspaceId}>{workspace.title}</option>)}
         </select></label>
         {files.status === 'loading' ? <p>正在读取文件…</p> : null}
@@ -85,11 +85,18 @@ export function ProjectFilesPanel({
             {editor.status === 'idle' ? <p>选择一个文件以查看和编辑。</p> : null}
             {editor.status === 'loading' ? <p>正在读取文件…</p> : null}
             {editor.status === 'error' ? <p role="alert">{editor.message}</p> : null}
-            {editor.status === 'ready' ? <><div className={css.projectEditorTitle}>{editor.path}</div><textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} /><Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button></> : null}
+            {editor.status === 'ready' ? <>
+              <div className={css.projectEditorToolbar}>
+                <div className={css.projectEditorTitle} title={editor.path}>{editor.path}</div>
+                <Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button>
+              </div>
+              <textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} />
+            </> : null}
           </div>
           <div className={css.projectTree}>
-            {files.path !== '.' ? <button type="button" onClick={() => loadDirectory(workspaceId!, files.path.split('/').slice(0, -1).join('/') || '.')}>..</button> : null}
-            {files.entries.map(entry => <button key={entry.path} type="button" onClick={() => entry.type === 'directory' ? loadDirectory(workspaceId!, entry.path) : openFile(entry.path)}>{entry.type === 'directory' ? '📁 ' : '📄 '}{entry.name}</button>)}
+            <div className={css.projectTreeHeader}>文件{files.path === '.' ? '' : ` · ${files.path}`}</div>
+            {files.path !== '.' ? <button className={css.projectTreeRow} type="button" onClick={() => loadDirectory(workspaceId!, files.path.split('/').slice(0, -1).join('/') || '.')}><span className={css.projectFileIcon}>↩</span>上一级</button> : null}
+            {files.entries.map(entry => <button key={entry.path} className={`${css.projectTreeRow} ${entry.type === 'file' && editor.status === 'ready' && editor.path === entry.path ? css.projectTreeRowActive : ''}`} type="button" onClick={() => entry.type === 'directory' ? loadDirectory(workspaceId!, entry.path) : openFile(entry.path)}><span className={css.projectFileIcon}>{entry.type === 'directory' ? '⌄' : '•'}</span><span>{entry.name}</span></button>)}
             {files.truncated ? <p>目录内容过多，仅显示前一部分。</p> : null}
           </div>
         </div> : null}
