@@ -41,7 +41,15 @@
 .projectEditorToolbar { flex: none; display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 8px 0 10px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
 .projectEditorToolbar button { flex: none; min-height: 24px; padding: 2px 9px; font-size: 12px; }
 .projectEditorTitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code); font-size: 12px; }
-.projectEditor textarea { flex: 1; min-height: 120px; border: 0; outline: 0; resize: none; padding: 12px; background: transparent; color: var(--dsw-alias-label-primary); font-family: var(--ds-font-family-code); font-size: 13px; line-height: 1.55; tab-size: 2; }
+.projectCodeEditor { flex: 1; min-height: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr); overflow: hidden; background: var(--dsw-alias-bg-base); font-family: var(--ds-font-family-code); font-size: 13px; line-height: 20px; }
+.projectCodeGutter { min-width: 0; overflow: hidden; padding: 12px 8px 12px 0; box-sizing: border-box; border-right: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-tertiary); text-align: right; user-select: none; }
+.projectCodeGutter > div { will-change: transform; }
+.projectCodeGutter span { display: block; height: 20px; }
+.projectCodeStage { position: relative; min-width: 0; overflow: hidden; }
+.projectCodeHighlight { position: absolute; inset: 0 auto auto 0; min-width: 100%; margin: 0; padding: 12px; box-sizing: border-box; color: var(--dsw-alias-label-primary); font: inherit; line-height: inherit; white-space: pre; pointer-events: none; will-change: transform; }
+.projectCodeLine { display: block; height: 20px; }
+.projectCodeInput { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; outline: 0; resize: none; padding: 12px; box-sizing: border-box; overflow: auto; background: transparent; color: transparent; caret-color: var(--dsw-alias-label-primary); font: inherit; line-height: inherit; letter-spacing: inherit; tab-size: 2; white-space: pre; }
+.projectCodeInput::selection { background: color-mix(in srgb, var(--dsw-alias-label-primary) 24%, transparent); }
 
 .iconButton {
   flex: none;
