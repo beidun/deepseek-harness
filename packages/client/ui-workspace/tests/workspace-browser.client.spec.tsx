@@ -79,6 +79,7 @@ function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
     insertWorkspaceBefore: vi.fn(async () => {}),
     insertSessionBefore: vi.fn(async () => {}),
     createWorkspace: vi.fn(async () => workspace('created', [])),
+    pickWorkspaceDirectory: vi.fn(async () => null),
     listProjectFiles: vi.fn(async () => ({ path: '.', entries: [], truncated: false })),
     readProjectFile: vi.fn(async () => ({ path: 'file.ts', content: '', version: 'version' as never })),
     saveProjectFile: vi.fn(async () => ({ path: 'file.ts', content: '', version: 'version' as never })),
@@ -764,13 +765,20 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByTestId('directory-flow')).toBeTruthy()
   })
 
-  it('hides the add button when no directory-flow occupant is composed', () => {
+  it('falls back to the host chooser when no directory-flow occupant is composed', async () => {
+    const pickWorkspaceDirectory = vi.fn(async () => '/projects/fallback')
+    const createWorkspace = vi.fn(async () => workspace('fallback', []))
+    const startSession = vi.fn()
     mount({
+      pickWorkspaceDirectory,
+      createWorkspace,
+      startSession,
       useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
       useDirectoryFlow: bindSnapshotSelector({ getSnapshot: () => false, subscribe: () => () => {} }),
     })
-    // Nothing to add with, so the header offers no dead button.
-    expect(screen.queryByRole('button', { name: '添加工作区' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '添加工作区' }))
+    await waitFor(() => expect(createWorkspace).toHaveBeenCalledWith({ path: '/projects/fallback' }))
+    expect(startSession).toHaveBeenCalledWith('fallback')
     expect(screen.getByText('alpha')).toBeTruthy()
   })
 
