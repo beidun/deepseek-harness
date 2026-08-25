@@ -138,6 +138,8 @@ export type WorkspaceBrowserInjected = {
   insertSessionBefore: (workspaceId: WorkspaceId, sessionId: SessionId, beforeSessionId?: SessionId) => Promise<void>
   /** Adopt a picked host directory as a real Workspace before targeting a Session. */
   createWorkspace: (input: { path: string }) => Promise<WorkspaceView>
+  /** Fallback native directory picker when its client flow surface is unavailable. */
+  pickWorkspaceDirectory: () => Promise<string | null>
   /** List one directory in a registered Workspace. */
   listProjectFiles: (workspaceId: WorkspaceId, path?: string) => Promise<ProjectFileListing>
   /** Read one editable project file. */
