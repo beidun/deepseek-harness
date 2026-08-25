@@ -21,17 +21,27 @@
 }
 
 .projectFilesDock { height: 100%; display: flex; flex-direction: column; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); }
-.projectFilesHeader { flex: none; display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 12px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
+.projectFilesHeader { flex: none; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 14px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
+.projectFilesHeader strong { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
 .projectFilesContent { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.projectFiles { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px; }
-.projectFiles select { max-width: 100%; margin-left: 8px; }
-.projectFilesBody { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 38%); gap: 12px; }
-.projectTree { display: flex; flex-direction: column; overflow: auto; border-left: 1px solid var(--dsw-alias-border-secondary); }
-.projectTree button { border: 0; padding: 6px 8px; text-align: left; background: transparent; color: var(--dsw-alias-label-primary); cursor: pointer; }
-.projectTree button:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.projectEditor { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-.projectEditorTitle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
-.projectEditor textarea { flex: 1; min-height: 120px; resize: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.projectFiles { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 14px; }
+.projectFilesEmpty { margin: 20px; color: var(--dsw-alias-label-secondary); }
+.projectWorkspaceSelect { flex: none; display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.projectWorkspaceSelect select { min-width: 0; flex: 1; height: 30px; padding: 0 8px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 7px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font: inherit; }
+.projectFilesBody { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 34%); gap: 0; border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; overflow: hidden; background: var(--dsw-specific-sidebar-fill); }
+.projectTree { display: flex; flex-direction: column; min-width: 0; overflow: auto; border-left: 1px solid var(--dsw-alias-border-l2); }
+.projectTreeHeader { flex: none; height: 34px; display: flex; align-items: center; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-bottom: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); font-size: 12px; font-weight: 500; }
+.projectTreeRow { flex: none; min-width: 0; display: flex; align-items: center; gap: 7px; border: 0; padding: 7px 10px; overflow: hidden; text-align: left; white-space: nowrap; background: transparent; color: var(--dsw-alias-label-primary); cursor: pointer; font: inherit; font-size: 13px; }
+.projectTreeRow > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.projectFileIcon { width: 12px; flex: none; color: var(--dsw-alias-label-tertiary); font-size: 12px; text-align: center; }
+.projectTreeRow:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.projectTreeRowActive { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); box-shadow: inset 2px 0 0 var(--dsw-alias-label-primary); }
+.projectEditor { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--dsw-alias-bg-base); }
+.projectEditor > p { margin: auto; padding: 20px; color: var(--dsw-alias-label-secondary); font-size: 13px; text-align: center; }
+.projectEditorToolbar { flex: none; display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 8px 0 10px; border-bottom: 1px solid var(--dsw-alias-border-l2); }
+.projectEditorToolbar button { flex: none; min-height: 24px; padding: 2px 9px; font-size: 12px; }
+.projectEditorTitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code); font-size: 12px; }
+.projectEditor textarea { flex: 1; min-height: 120px; border: 0; outline: 0; resize: none; padding: 12px; background: transparent; color: var(--dsw-alias-label-primary); font-family: var(--ds-font-family-code); font-size: 13px; line-height: 1.55; tab-size: 2; }
 
 .iconButton {
   flex: none;
