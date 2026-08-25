@@ -89,6 +89,17 @@ export class ProjectFilesService extends TypertRemoteService {
     const outcome = await this.ctx.fs.writeText(target, content, { kind: 'replaceIfVersion', version: FsVersion(expectedVersion) })
     return { path, content: outcome.after, version: outcome.version }
   }
+
+  /** Create a new text file without replacing a concurrent or existing file. */
+  @Remote('create')
+  async create(workspaceId: string, path: string, content: string): Promise<ProjectFileContent> {
+    if (path === '.' || path.endsWith('/') || path.split(/[\\/]/).some(part => part === '' || part === '.')) {
+      throw new Error('project file path is not a new file path')
+    }
+    const target = await resolveInside(this.ctx, this.workspace(workspaceId), path)
+    const outcome = await this.ctx.fs.writeText(target, content, { kind: 'createIfAbsent' })
+    return { path, content: outcome.after, version: outcome.version }
+  }
 }
 
 export default ProjectFilesService
