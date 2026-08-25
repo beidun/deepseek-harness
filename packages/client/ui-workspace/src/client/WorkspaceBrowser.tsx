@@ -758,6 +758,7 @@ export function WorkspaceBrowser({
   archiveSession,
   insertSessionBefore,
   createWorkspace,
+  pickWorkspaceDirectory,
   openProjectFiles,
   searchSessions,
   searchResultLimit,
@@ -804,6 +805,8 @@ export function WorkspaceBrowser({
   const [wsPickerOpen, setWsPickerOpen] = useState(false)
   const wsPlusRef = useRef<HTMLButtonElement>(null)
   const composingRef = useRef(false)
+  const [addingWorkspace, setAddingWorkspace] = useState(false)
+  const [addWorkspaceError, setAddWorkspaceError] = useState<string | null>(null)
 
   // Rail search = expand + land in the search box: the flag arms before the
   // expand request; once the shell flips wide the input mounts and takes focus.
@@ -983,6 +986,23 @@ export function WorkspaceBrowser({
     })
   }
 
+  /** Keep Workspace creation available even while the optional picker UI has not mounted. */
+  const addWorkspace = (): void => {
+    if (addingWorkspace) return
+    if (directoryFlowAvailable) {
+      setWsPickerOpen(value => !value)
+      return
+    }
+    setAddingWorkspace(true)
+    setAddWorkspaceError(null)
+    void pickWorkspaceDirectory().then((path) => {
+      if (path === null) return undefined
+      return createWorkspace({ path }).then(workspace => { startSession(workspace.workspaceId) })
+    }).catch((reason: unknown) => {
+      setAddWorkspaceError(reason instanceof Error ? reason.message : String(reason))
+    }).finally(() => { setAddingWorkspace(false) })
+  }
+
   return (
     <div className={clsx(css.root, !wide && css.rail)}>
       <div className={css.sectionHeader}>
@@ -1071,24 +1091,18 @@ export function WorkspaceBrowser({
               <IconFolderOpenOutline16 size={wide ? 16 : 18} />
             </button>
           </Tooltip>
-          {/* Adding is the button's one action, so a composition with no
-              picking affordance has nothing to offer here: the region hides the
-              button rather than leaving a dead one in the header. */}
-          {directoryFlowAvailable && (
-            <Tooltip label={t('workspace.add')} side="bottom" delayMs={500}>
-              <button
-                ref={wsPlusRef}
-                type="button"
-                className={css.iconButton}
-                aria-label={t('workspace.add')}
-                onClick={() => {
-                  setWsPickerOpen(v => !v)
-                }}
-              >
-                <IconProjectAddOutline16 size={wide ? 16 : 18} />
-              </button>
-            </Tooltip>
-          )}
+          <Tooltip label={t('workspace.add')} side="bottom" delayMs={500}>
+            <button
+              ref={wsPlusRef}
+              type="button"
+              className={css.iconButton}
+              aria-label={t('workspace.add')}
+              disabled={addingWorkspace}
+              onClick={addWorkspace}
+            >
+              <IconProjectAddOutline16 size={wide ? 16 : 18} />
+            </button>
+          </Tooltip>
         </div>
         {/* Add flow + its error dialog (same package — direct composition). */}
         <WorkspacePickFlow
@@ -1190,6 +1204,16 @@ export function WorkspaceBrowser({
               />
             ))}
       </div>
+
+      <Modal
+        open={addWorkspaceError !== null}
+        onClose={() => { if (!addingWorkspace) setAddWorkspaceError(null) }}
+        closeLabel={t('close')}
+        title={t('folderError.title')}
+        footer={<Button variant="primary" onClick={() => setAddWorkspaceError(null)}>{t('close')}</Button>}
+      >
+        <div className={css.renameError} role="alert">{addWorkspaceError}</div>
+      </Modal>
 
       <Modal
         open={renameTarget !== null}
