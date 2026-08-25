@@ -3,6 +3,7 @@ import { Button, IconCloseFill14 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { WorkspaceId, WorkspaceView } from '@deepseek-ai/dsh-client-runtime/client'
 import type { WorkspaceBrowserProps } from './contract/slots.ts'
 import type { ProjectFileContent } from '@deepseek-ai/dsh-api-remotes/client'
+import { ProjectCodeEditor } from './ProjectCodeEditor.tsx'
 import css from './WorkspaceBrowser.module.css'
 
 type FileState =
@@ -90,7 +91,13 @@ export function ProjectFilesPanel({
                 <div className={css.projectEditorTitle} title={editor.path}>{editor.path}</div>
                 <Button variant="primary" disabled={editor.saving} onClick={save}>{editor.saving ? '保存中…' : '保存'}</Button>
               </div>
-              <textarea aria-label={editor.path} value={editor.content} onChange={event => setEditor({ ...editor, content: event.currentTarget.value })} />
+              <ProjectCodeEditor
+                path={editor.path}
+                value={editor.content}
+                onChange={content => setEditor({ ...editor, content })}
+                onSave={save}
+                saving={editor.saving}
+              />
             </> : null}
           </div>
           <div className={css.projectTree}>
